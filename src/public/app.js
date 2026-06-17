@@ -4,51 +4,8 @@ async function getJson(url, options) {
   return { response, payload };
 }
 
-const viewMetadata = {
-  orders: {
-    title: 'Orders workspace',
-    subtitle:
-      'Create, track, and validate order flows while the redesigned shell keeps the portal organized.'
-  },
-  dashboard: {
-    title: 'Delivery dashboard',
-    subtitle:
-      'Summarize project signals, governance checkpoints, and visible proof for the demo audience.'
-  },
-  admin: {
-    title: 'Admin placeholder',
-    subtitle:
-      'Reserve space for future admin workflows without expanding this issue beyond the shell and navigation foundation.'
-  }
-};
-
 function pretty(value) {
   return JSON.stringify(value, null, 2);
-}
-
-function setActiveView(viewName) {
-  const view = viewMetadata[viewName];
-  if (!view) {
-    return;
-  }
-
-  document.querySelectorAll('[data-view-target]').forEach(button => {
-    const isActive = button.dataset.viewTarget === viewName;
-    button.classList.toggle('active', isActive);
-    if (isActive) {
-      button.setAttribute('aria-current', 'page');
-    } else {
-      button.removeAttribute('aria-current');
-    }
-  });
-
-  document.querySelectorAll('.view-panel').forEach(panel => {
-    panel.hidden = panel.id !== `view-${viewName}`;
-  });
-
-  document.getElementById('page-title').textContent = view.title;
-  document.getElementById('page-subtitle').textContent = view.subtitle;
-  document.title = `Portal Web - ${view.title}`;
 }
 
 function renderLinks(links) {
@@ -90,11 +47,7 @@ async function refreshHealth() {
   target.textContent = pretty(payload);
 }
 
-document.querySelectorAll('[data-view-target]').forEach(button => {
-  button.addEventListener('click', () => setActiveView(button.dataset.viewTarget));
-});
-
-document.getElementById('create-order-form').addEventListener('submit', async event => {
+document.getElementById('create-order-form').addEventListener('submit', async (event) => {
   event.preventDefault();
   const form = new FormData(event.currentTarget);
   const body = {
@@ -115,7 +68,7 @@ document.getElementById('create-order-form').addEventListener('submit', async ev
   document.getElementById('create-result').textContent = pretty(payload);
 });
 
-document.getElementById('track-order-form').addEventListener('submit', async event => {
+document.getElementById('track-order-form').addEventListener('submit', async (event) => {
   event.preventDefault();
   const form = new FormData(event.currentTarget);
   const orderId = form.get('orderId');
@@ -128,6 +81,5 @@ document.getElementById('track-order-form').addEventListener('submit', async eve
 
 document.getElementById('refresh-health').addEventListener('click', refreshHealth);
 
-setActiveView('orders');
 loadConfig();
 refreshHealth();
