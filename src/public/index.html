@@ -7,60 +7,119 @@
     <link rel="stylesheet" href="/styles.css">
   </head>
   <body>
-    <header class="hero">
-      <div>
-        <p class="eyebrow">Agentic SDLC Demo</p>
-        <h1>Portal Web</h1>
-        <p class="subtitle">Visible business flow, engineering evidence, and deployment traceability in one place.</p>
-      </div>
-      <div class="meta-card">
-        <div><span>Environment</span><strong id="environment-name">Loading...</strong></div>
-        <div><span>Build</span><strong id="build-sha">Loading...</strong></div>
-        <div><span>Gateway</span><strong id="gateway-url">Loading...</strong></div>
-      </div>
-    </header>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Sidebar navigation">
+        <div class="sidebar-top">
+          <p class="eyebrow">Agentic SDLC Demo</p>
+          <h1 class="sidebar-title">Portal Shell</h1>
+          <p class="sidebar-copy">Structured work intake, visible evidence, and navigation for the customer demo path.</p>
 
-    <main class="layout">
-      <section class="card">
-        <h2>Create order</h2>
-        <form id="create-order-form">
-          <label>Order ID<input name="orderId" value="ORD-PORTAL-001" required></label>
-          <label>Customer ID<input name="customerId" value="CUST-PORTAL-1" required></label>
-          <label>SKU<input name="sku" value="SKU-100" required></label>
-          <label>Quantity<input name="quantity" type="number" value="1" min="1" required></label>
-          <button type="submit">Create order</button>
-        </form>
-        <div class="inline-meta">
-          <span>Correlation ID</span>
-          <code id="create-correlation">Not generated yet</code>
+          <nav class="sidebar-nav" aria-label="Primary" data-testid="sidebar-nav">
+            <button class="nav-item active" type="button" data-view-target="orders" aria-current="page">
+              <span class="nav-icon" aria-hidden="true">O</span>
+              <span class="nav-label">Orders</span>
+            </button>
+            <button class="nav-item" type="button" data-view-target="dashboard">
+              <span class="nav-icon" aria-hidden="true">D</span>
+              <span class="nav-label">Dashboard</span>
+            </button>
+            <button class="nav-item" type="button" data-view-target="admin">
+              <span class="nav-icon" aria-hidden="true">A</span>
+              <span class="nav-label">Admin</span>
+            </button>
+          </nav>
         </div>
-        <pre id="create-result">No order created yet.</pre>
-      </section>
 
-      <section class="card">
-        <h2>Track order</h2>
-        <form id="track-order-form">
-          <label>Order ID<input name="orderId" value="ORD-PORTAL-001" required></label>
-          <button type="submit">Track order</button>
-        </form>
-        <div class="inline-meta">
-          <span>Correlation ID</span>
-          <code id="track-correlation">Not generated yet</code>
-        </div>
-        <pre id="track-result">No order tracked yet.</pre>
-      </section>
+        <section class="profile-card" aria-label="User profile">
+          <div class="profile-avatar" aria-hidden="true">MS</div>
+          <div class="profile-details">
+            <strong>Demo Engineer</strong>
+            <span>Microsoft field walkthrough</span>
+          </div>
+        </section>
+      </aside>
 
-      <section class="card">
-        <h2>System status</h2>
-        <button id="refresh-health" type="button">Refresh health</button>
-        <pre id="health-result">Waiting for health check.</pre>
-      </section>
+      <main class="app-main">
+        <header class="page-header">
+          <div>
+            <p class="eyebrow">Visible business flow</p>
+            <h1 id="page-title">Orders workspace</h1>
+            <p class="subtitle" id="page-subtitle">Create, track, and validate order flows while the redesigned shell keeps the portal organized.</p>
+          </div>
+          <div class="meta-card">
+            <div><span>Environment</span><strong id="environment-name">Loading...</strong></div>
+            <div><span>Build</span><strong id="build-sha">Loading...</strong></div>
+            <div><span>Gateway</span><strong id="gateway-url">Loading...</strong></div>
+          </div>
+        </header>
 
-      <section class="card wide">
-        <h2>Demo evidence links</h2>
-        <div class="link-grid" id="link-grid"></div>
-      </section>
-    </main>
+        <section class="view-panel layout" id="view-orders">
+          <section class="card">
+            <h2>Create order</h2>
+            <form id="create-order-form">
+              <label>Order ID<input name="orderId" value="ORD-PORTAL-001" required></label>
+              <label>Customer ID<input name="customerId" value="CUST-PORTAL-1" required></label>
+              <label>SKU<input name="sku" value="SKU-100" required></label>
+              <label>Quantity<input name="quantity" type="number" value="1" min="1" required></label>
+              <button type="submit">Create order</button>
+            </form>
+            <div class="inline-meta">
+              <span>Correlation ID</span>
+              <code id="create-correlation">Not generated yet</code>
+            </div>
+            <pre id="create-result">No order created yet.</pre>
+          </section>
+
+          <section class="card">
+            <h2>Track order</h2>
+            <form id="track-order-form">
+              <label>Order ID<input name="orderId" value="ORD-PORTAL-001" required></label>
+              <button type="submit">Track order</button>
+            </form>
+            <div class="inline-meta">
+              <span>Correlation ID</span>
+              <code id="track-correlation">Not generated yet</code>
+            </div>
+            <pre id="track-result">No order tracked yet.</pre>
+          </section>
+
+          <section class="card">
+            <h2>System status</h2>
+            <button id="refresh-health" type="button">Refresh health</button>
+            <pre id="health-result">Waiting for health check.</pre>
+          </section>
+
+          <section class="card wide">
+            <h2>Demo evidence links</h2>
+            <div class="link-grid" id="link-grid"></div>
+          </section>
+        </section>
+
+        <section class="view-panel" id="view-dashboard" hidden>
+          <div class="dashboard-grid">
+            <section class="card">
+              <h2>Executive summary</h2>
+              <p class="muted-copy">Use this space to highlight cycle time, deployment readiness, and visible issue-to-code traceability for the demo.</p>
+            </section>
+            <section class="card">
+              <h2>Delivery signals</h2>
+              <ul class="placeholder-list">
+                <li>GitHub Project tracks the epic and dependent issues.</li>
+                <li>Repo rules are loaded from `.github/` before task execution.</li>
+                <li>UI issues require screenshots and automated coverage.</li>
+              </ul>
+            </section>
+          </div>
+        </section>
+
+        <section class="view-panel" id="view-admin" hidden>
+          <section class="card">
+            <h2>Admin placeholder</h2>
+            <p class="muted-copy">Future admin workflows can land here without reworking the shell. This keeps the issue scoped while proving the navigation structure.</p>
+          </section>
+        </section>
+      </main>
+    </div>
 
     <script src="/app.js"></script>
   </body>
