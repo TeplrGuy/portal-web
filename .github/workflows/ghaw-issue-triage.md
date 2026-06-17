@@ -44,8 +44,9 @@ When a new issue arrives:
 
 4. **Identify required quality gates**:
    - CI (always required)
+   - Unit or service-level automated tests (always required)
    - Security scan (always required)
-   - Playwright e2e (required for any UI change)
+   - End-to-end validation (always required — Playwright for UI, full flow validation for backend/contract changes)
    - Human PR review (always required)
    - Load test (required if the change could affect throughput)
 
@@ -62,8 +63,9 @@ When a new issue arrives:
 
 **Required quality gates:**
 - [ ] CI
+- [ ] Unit/service-level automated tests
 - [ ] Security
-- [ ] Playwright e2e  (include only if UI changes expected)
+- [ ] End-to-end validation  (Playwright for UI, end-to-end service path for backend/contract work)
 - [ ] Human PR review
 - [ ] Load test  (include only if throughput impact expected)
 
@@ -75,7 +77,8 @@ When a new issue arrives:
 **Evidence expected at PR time:**
 - Screenshot or GIF for UI changes
 - curl output for API changes
-- Playwright report
+- Unit test report
+- End-to-end validation report
 ```
 
 6. **Apply labels** based on classification (bug, enhancement, incident, frontend, cross-service, delegated-candidate as appropriate).

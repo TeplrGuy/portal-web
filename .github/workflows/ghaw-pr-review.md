@@ -58,8 +58,9 @@ Analyze the pull request and:
 
 **Required before merge:**
 - [ ] CI green
+- [ ] Unit/service-level tests pass
 - [ ] Security scan green
-- [ ] Playwright tests pass  (include if UI changed)
+- [ ] End-to-end validation passes  (Playwright for UI, full path validation for backend/contract changes)
 - [ ] Human code review approval
 - [ ] Load test approved  (include if throughput affected)
 
