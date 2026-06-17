@@ -1,0 +1,44 @@
+name: azure-load-test
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: Portal base URL
+        required: true
+        default: https://agtsdlc-devne-portal.ambitiousmoss-50e2d95d.northeurope.azurecontainerapps.io
+      engine_instances:
+        description: Azure Load Testing engine instances
+        required: true
+        default: '1'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  load-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TARGET_URL: ${{ inputs.target_url }}
+      ENGINE_INSTANCES: ${{ inputs.engine_instances }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Render load test config
+        shell: pwsh
+        run: |
+          (Get-Content load-tests/portal-loadtest.yaml) `
+            -replace '__TARGET_URL__', $env:TARGET_URL `
+            -replace '__ENGINE_INSTANCES__', $env:ENGINE_INSTANCES |
+            Set-Content load-tests/portal-loadtest.rendered.yaml
+      - name: Run Azure Load Testing
+        uses: azure/load-testing@v2
+        with:
+          loadTestConfigFile: load-tests/portal-loadtest.rendered.yaml
+          testPlan: load-tests/portal-smoke.jmx

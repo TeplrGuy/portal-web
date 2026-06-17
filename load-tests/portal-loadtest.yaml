@@ -1,0 +1,16 @@
+testId: portal-smoke
+displayName: Portal smoke load test
+description: Baseline Azure Load Testing run for the portal web demo flow
+engineInstances: __ENGINE_INSTANCES__
+
+testPlan:
+  file: load-tests/portal-smoke.jmx
+
+environmentVariables:
+  - name: TARGET_URL
+    value: __TARGET_URL__
+
+passFailCriteria:
+  - metric: response_time_ms
+    aggregation: avg
+    condition: < 2000

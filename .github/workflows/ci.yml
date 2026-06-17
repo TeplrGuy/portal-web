@@ -20,5 +20,7 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
       - run: node --check src/server.js
       - run: node --check src/public/app.js
+      - run: npm run test:e2e
