@@ -256,6 +256,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: read
+      copilot-requests: write
       contents: read
       issues: read
       pull-requests: read
@@ -1106,4 +1107,3 @@ jobs:
           name: safe-output-items
           path: /tmp/gh-aw/safe-output-items.jsonl
           if-no-files-found: ignore
-
