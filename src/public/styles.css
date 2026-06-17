@@ -1,0 +1,141 @@
+:root {
+  color-scheme: dark;
+  font-family: Arial, sans-serif;
+  --bg: #0f172a;
+  --panel: #111827;
+  --panel-border: #334155;
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --accent-2: #22c55e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+  color: var(--text);
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--accent);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+h1, h2 {
+  margin: 0 0 0.75rem;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--muted);
+}
+
+.meta-card,
+.card {
+  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+}
+
+.meta-card {
+  min-width: 280px;
+  padding: 1rem;
+}
+
+.meta-card div {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.75rem;
+}
+
+.meta-card span,
+.inline-meta span,
+label {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.card {
+  padding: 1.25rem;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+input,
+button {
+  width: 100%;
+  margin-top: 0.25rem;
+  border-radius: 10px;
+  border: 1px solid var(--panel-border);
+  padding: 0.8rem 0.9rem;
+  background: #020617;
+  color: var(--text);
+}
+
+button {
+  cursor: pointer;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #020617;
+  font-weight: 700;
+  border: none;
+}
+
+pre,
+code {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #020617;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 0.9rem;
+}
+
+.inline-meta {
+  margin: 1rem 0;
+}
+
+.link-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.link-grid a {
+  display: block;
+  padding: 0.9rem;
+  text-decoration: none;
+  color: var(--text);
+  background: #020617;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+}

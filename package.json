@@ -1,0 +1,13 @@
+{
+  "name": "portal-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SDLC demo frontend portal",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

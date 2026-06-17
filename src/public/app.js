@@ -1,0 +1,85 @@
+async function getJson(url, options) {
+  const response = await fetch(url, options);
+  const payload = await response.json().catch(() => ({}));
+  return { response, payload };
+}
+
+function pretty(value) {
+  return JSON.stringify(value, null, 2);
+}
+
+function renderLinks(links) {
+  const grid = document.getElementById('link-grid');
+  grid.innerHTML = '';
+
+  const items = [
+    ['Portal repo', links.portal],
+    ['Gateway repo', links.gateway],
+    ['Orders repo', links.orders],
+    ['Contracts repo', links.contracts],
+    ['Feature scenario issue', links.scenarioFeature],
+    ['Incident scenario issue', links.scenarioIncident],
+    ['Rollback scenario issue', links.scenarioRollback]
+  ];
+
+  items.forEach(([label, href]) => {
+    const anchor = document.createElement('a');
+    anchor.href = href;
+    anchor.target = '_blank';
+    anchor.rel = 'noreferrer';
+    anchor.textContent = label;
+    grid.appendChild(anchor);
+  });
+}
+
+async function loadConfig() {
+  const { payload } = await getJson('/config');
+  document.getElementById('environment-name').textContent = payload.environmentName;
+  document.getElementById('build-sha').textContent = payload.buildSha;
+  document.getElementById('gateway-url').textContent = payload.apiGatewayUrl;
+  renderLinks(payload.repoLinks);
+}
+
+async function refreshHealth() {
+  const target = document.getElementById('health-result');
+  target.textContent = 'Loading health...';
+  const { payload } = await getJson('/api/health');
+  target.textContent = pretty(payload);
+}
+
+document.getElementById('create-order-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const form = new FormData(event.currentTarget);
+  const body = {
+    orderId: form.get('orderId'),
+    customerId: form.get('customerId'),
+    sku: form.get('sku'),
+    quantity: Number(form.get('quantity'))
+  };
+
+  const { response, payload } = await getJson('/api/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  document.getElementById('create-correlation').textContent =
+    response.headers.get('x-correlation-id') || payload.correlationId || 'Unavailable';
+  document.getElementById('create-result').textContent = pretty(payload);
+});
+
+document.getElementById('track-order-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const form = new FormData(event.currentTarget);
+  const orderId = form.get('orderId');
+  const { response, payload } = await getJson(`/api/orders/${encodeURIComponent(orderId)}`);
+
+  document.getElementById('track-correlation').textContent =
+    response.headers.get('x-correlation-id') || payload.correlationId || 'Unavailable';
+  document.getElementById('track-result').textContent = pretty(payload);
+});
+
+document.getElementById('refresh-health').addEventListener('click', refreshHealth);
+
+loadConfig();
+refreshHealth();
