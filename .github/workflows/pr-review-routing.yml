@@ -1,0 +1,114 @@
+name: pr-review-routing
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  route-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100
+            });
+
+            const filePaths = files.map(f => f.filename);
+            const touchedWorkflow = filePaths.some(path => path.startsWith('.github/workflows/'));
+            const touchedLoadTest = filePaths.some(path => path.startsWith('load-tests/'));
+            const touchedUi = filePaths.some(path => path.startsWith('src/public/'));
+
+            const routeLabel = touchedWorkflow || touchedLoadTest ? 'review:platform' : 'review:app';
+            const labelsToEnsure = [
+              ['review:app', '1D76DB', 'Application-focused review path'],
+              ['review:platform', '5319E7', 'Platform/workflow-focused review path'],
+              ['review:delegation-candidate', 'FBCA04', 'Candidate for delegated parallel implementation']
+            ];
+
+            for (const [name, color, description] of labelsToEnsure) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name
+                });
+              } catch (error) {
+                if (error.status === 404) {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name,
+                    color,
+                    description
+                  });
+                } else {
+                  throw error;
+                }
+              }
+            }
+
+            const labels = [routeLabel];
+            if (touchedWorkflow || touchedLoadTest) labels.push('review:delegation-candidate');
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              labels
+            });
+
+            const summary = [
+              '<!-- portal-pr-routing-comment -->',
+              '## Automated PR routing summary',
+              '',
+              `**Route:** \`${routeLabel}\``,
+              '',
+              '**Detected scope:**',
+              `- UI files changed: ${touchedUi ? 'yes' : 'no'}`,
+              `- Workflow files changed: ${touchedWorkflow ? 'yes' : 'no'}`,
+              `- Load-test assets changed: ${touchedLoadTest ? 'yes' : 'no'}`,
+              '',
+              '**Required review sequence:**',
+              '1. CI + security + Playwright checks',
+              '2. Human code review',
+              '3. Promotion/load-test decision for environment',
+              '',
+              '**Session safety reminders:**',
+              '- One PR branch = one implementation owner',
+              '- Review stays separate from implementation session'
+            ].join('\n');
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number
+            });
+
+            const existing = comments.find(comment => comment.body.includes('<!-- portal-pr-routing-comment -->'));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: summary
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: summary
+              });
+            }
