@@ -8,7 +8,6 @@ permissions:
   issues: read
   pull-requests: read
 tracker-id: portal-triage-panel-v1
-max-ai-credits: 3
 safe-outputs:
   add-comment:
     max: 1
