@@ -1,17 +1,14 @@
 ---
+description: Triage panel — classify issues, scope analysis, owner model recommendation
 on:
   issues:
     types: [opened, edited, reopened, labeled]
-
 permissions:
   contents: read
   issues: read
   pull-requests: read
-
-engine: copilot
 tracker-id: portal-triage-panel-v1
 max-ai-credits: 3
-
 safe-outputs:
   add-comment:
     max: 1
