@@ -6,6 +6,8 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
+    "test:unit": "node --check src/server.js && node --check src/public/app.js",
+    "test:integration": "node --test tests/integration/**/*.test.js",
     "test:e2e": "playwright test"
   },
   "devDependencies": {

@@ -20,7 +20,19 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium
-      - run: node --check src/server.js
-      - run: node --check src/public/app.js
-      - run: npm run test:e2e
+      - run: npm run test:unit
+      - run: npm run test:integration
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            e2e:
+              - 'src/public/**'
+              - 'src/server.js'
+              - 'tests/**/*.ts'
+              - 'playwright.config.ts'
+              - 'package.json'
+      - if: steps.changes.outputs.e2e == 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.changes.outputs.e2e == 'true'
+        run: npm run test:e2e
