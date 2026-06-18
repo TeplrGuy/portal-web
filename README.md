@@ -34,6 +34,18 @@ gh aw compile
 
 Commit both `.md` source workflows and generated `.lock.yml` files after compilation.
 
+## Skills lock and sync
+
+`.github/skills/skills.lock.json` pins the version and channel of the shared engineering-skills platform consumed by this repo. It lists which skills (e.g. `pr-review`, `issue-triage`) are active and which release channel (`stable`, `canary`) and version to pull from `TeplrGuy/engineering-skills`.
+
+Run `skills-sync.yml` (via **Actions → Sync Engineering Skills → Run workflow**) whenever you need to:
+
+- Pull in a new skill version after the central `engineering-skills` repo has published an update.
+- Add or remove a skill from the `skills` array in `skills.lock.json`.
+- Recover after a manual edit to the contracts under `.github/skills/contracts/`.
+
+The workflow runs automatically on a weekday schedule (`0 5 * * 1-5`) and opens a PR when it detects changes. Merge that PR to apply the update.
+
 ## Environment variables
 
 - `PORT` - HTTP port (default `3000`)
