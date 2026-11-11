@@ -2,18 +2,25 @@
   "name": "portal-web",
   "version": "0.1.0",
   "private": true,
+  "engines": { "node": ">=24" },
   "description": "SDLC demo frontend portal",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "test:unit": "node --check src/server.js && node --check src/public/app.js",
-    "test:integration": "node --test tests/integration/**/*.test.js",
+    "lint": "eslint src tests/integration",
+    "test:syntax": "node --check src/server.js && node --check src/public/app.js",
+    "test:integration": "node --test \"tests/integration/*.test.js\"",
     "test:e2e": "playwright test"
   },
   "devDependencies": {
+    "eslint": "^9.39.1",
     "@playwright/test": "^1.54.1"
   },
   "dependencies": {
+    "@microsoft/opentelemetry": "1.5.0",
+    "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/instrumentation": "0.221.0",
+    "@opentelemetry/instrumentation-undici": "0.24.0",
     "express": "^4.19.2"
   }
 }
