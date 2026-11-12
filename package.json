@@ -7,13 +7,16 @@
   "scripts": {
     "start": "node src/server.js",
     "test:unit": "node --check src/server.js && node --check src/public/app.js",
-    "test:integration": "node --test tests/integration/**/*.test.js",
+    "test:integration": "node --test tests/integration",
     "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@playwright/test": "^1.54.1"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.22.3"
+  },
+  "overrides": {
+    "qs": "^6.17.1"
   }
 }

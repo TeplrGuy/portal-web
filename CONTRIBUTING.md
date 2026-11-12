@@ -27,3 +27,14 @@ Use the repository PR template and include evidence links for:
 - workflow runs,
 - risk/rollback decisions.
 
+## Local checks
+
+Run `npm ci`, `npm run test:unit`, `npm run test:integration`,
+`npm run test:e2e`, and `npm audit --audit-level=high` before requesting review.
+The integration command uses Node's directory discovery so it also works on the
+Node 20 CI runner without shell-dependent recursive glob expansion.
+`test:unit` currently checks JavaScript syntax; do not report it as behavioral
+unit-test coverage.
+The browser regression mocks health and order APIs; it does not verify a live
+gateway or Azure deployment.
+
