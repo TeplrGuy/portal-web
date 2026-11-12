@@ -80,3 +80,13 @@ settle before any live browser validation. Do not auto-close #3/#28/#29 on merge
 record the deployed revision, immutable image digest, full-stack validation and
 screenshots before declaring delivery complete.
 
+## Local checks
+
+Run `npm ci`, `npm run lint`, `npm run test:syntax`, `npm run test:integration`,
+`npm run test:e2e`, and `npm audit --audit-level=high` before requesting review.
+The integration command uses Node's directory discovery without shell-dependent
+recursive glob expansion. `test:syntax` checks JavaScript syntax; do not report
+it as behavioral unit-test coverage. `test:unit` remains an alias for it.
+The browser regression mocks health and order APIs; it does not verify a live
+gateway or Azure deployment.
+
