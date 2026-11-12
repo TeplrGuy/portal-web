@@ -89,6 +89,7 @@
                 <span>Correlation ID</span>
                 <code id="create-correlation">Not generated yet</code>
               </div>
+              <p id="create-status" class="request-status" data-state="idle" role="status" aria-live="polite">Ready to create an order.</p>
               <pre id="create-result">No order created yet.</pre>
             </section>
 
@@ -102,13 +103,14 @@
                 <span>Correlation ID</span>
                 <code id="track-correlation">Not generated yet</code>
               </div>
+              <p id="track-status" class="request-status" data-state="idle" role="status" aria-live="polite">Ready to track an order.</p>
               <pre id="track-result">No order tracked yet.</pre>
             </section>
 
             <section class="card">
               <h2>System status</h2>
               <button id="refresh-health" type="button">Refresh health</button>
-              <pre id="health-result">Waiting for health check.</pre>
+              <pre id="health-result" data-state="idle" role="status" aria-live="polite">Waiting for health check.</pre>
             </section>
 
             <section class="card wide">

@@ -85,6 +85,14 @@ test('creates and tracks an order through the portal', async ({ page }) => {
   await page.getByLabel('Quantity').fill('1');
   await page.locator('#create-order-form').getByRole('button', { name: 'Create order' }).click();
 
+  await expect(page.locator('#create-status')).toHaveText('Order created successfully.');
+  await expect(page.locator('#create-status')).toHaveAttribute('data-state', 'success');
+  const successStatusColors = await page.locator('#create-status').evaluate((element) => ({
+    foreground: getComputedStyle(element).color,
+    background: getComputedStyle(element.parentElement!).backgroundColor
+  }));
+  expect(contrastRatio(successStatusColors.foreground, successStatusColors.background))
+    .toBeGreaterThanOrEqual(4.5);
   await expect(page.locator('#create-result')).toContainText(orderId, { timeout: 30_000 });
   await expect(page.locator('#create-result')).toContainText('"status": "created"', { timeout: 30_000 });
   await expect(page.locator('#create-result')).toContainText('"notification_accepted"', { timeout: 30_000 });
@@ -93,6 +101,8 @@ test('creates and tracks an order through the portal', async ({ page }) => {
   await page.getByLabel('Order ID').nth(1).fill(orderId);
   await page.getByRole('button', { name: 'Track order' }).click();
 
+  await expect(page.locator('#track-status')).toHaveText('Order details loaded successfully.');
+  await expect(page.locator('#track-status')).toHaveAttribute('data-state', 'success');
   await expect(page.locator('#track-result')).toContainText(orderId, { timeout: 30_000 });
   await expect(page.locator('#track-result')).toContainText('"status": "created"', { timeout: 30_000 });
   await expect(page.locator('#track-result')).toContainText('"inventory_reserved"', { timeout: 30_000 });
@@ -232,4 +242,82 @@ test('navigates the app shell and keeps navigation compact on mobile', async ({ 
   expect(sidebarBox?.y).toBeCloseTo(0, 0);
   expect(profileBox?.y).toBeGreaterThanOrEqual(0);
   expect(profileBox?.y + profileBox.height).toBeLessThanOrEqual(844);
+});
+
+test('shows loading, success, and error states for order and health requests', async ({ page }) => {
+  let healthRequests = 0;
+  await page.route('**/api/health', async route => {
+    healthRequests += 1;
+    await route.fulfill({
+      status: healthRequests === 1 ? 200 : 503,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        message: healthRequests === 1 ? undefined : 'gateway unavailable',
+        status: healthRequests === 1 ? 'ok' : undefined
+      })
+    });
+  });
+
+  await page.route('**/api/orders', async route => {
+    if (route.request().method() === 'POST') {
+      await new Promise(resolve => setTimeout(resolve, 150));
+      await route.fulfill({
+        status: 503,
+        contentType: 'application/json',
+        headers: { 'x-correlation-id': 'corr-create-error' },
+        body: JSON.stringify({ message: 'order service unavailable' })
+      });
+      return;
+    }
+    await route.continue();
+  });
+
+  await page.route('**/api/orders/*', async route => {
+    if (route.request().method() === 'GET') {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await route.fulfill({
+        status: 404,
+        contentType: 'application/json',
+        headers: { 'x-correlation-id': 'corr-track-error' },
+        body: JSON.stringify({ message: 'order not found' })
+      });
+      return;
+    }
+    await route.continue();
+  });
+
+  await page.goto('/');
+  await expect(page.locator('#health-result')).toContainText('"status": "ok"');
+
+  await page.locator('#create-order-form').getByRole('button', { name: 'Create order' }).click();
+  await expect(page.locator('#create-status')).toHaveText('Creating order...');
+  await expect(page.locator('#create-status')).toHaveAttribute('data-state', 'loading');
+  await expect(page.locator('#create-status')).toHaveText('Order creation failed: order service unavailable');
+  await expect(page.locator('#create-status')).toHaveAttribute('data-state', 'error');
+  const errorStatusColors = await page.locator('#create-status').evaluate((element) => ({
+    foreground: getComputedStyle(element).color,
+    background: getComputedStyle(element.parentElement!).backgroundColor
+  }));
+  expect(contrastRatio(errorStatusColors.foreground, errorStatusColors.background))
+    .toBeGreaterThanOrEqual(4.5);
+  await expect(page.locator('#create-correlation')).toHaveText('corr-create-error');
+  await expect(page.locator('#create-result')).toContainText('order service unavailable');
+
+  await page.locator('#track-order-form').getByRole('button', { name: 'Track order' }).click();
+  await expect(page.locator('#track-status')).toHaveText('Looking up order...');
+  await expect(page.locator('#track-status')).toHaveAttribute('data-state', 'loading');
+  await expect(page.locator('#track-status')).toHaveText('Order lookup failed: order not found');
+  await expect(page.locator('#track-status')).toHaveAttribute('data-state', 'error');
+  await expect(page.locator('#track-correlation')).toHaveText('corr-track-error');
+  await expect(page.locator('#track-result')).toContainText('order not found');
+
+  await page.getByRole('button', { name: 'Refresh health' }).click();
+  await expect(page.locator('#health-result')).toHaveText('Health check failed: gateway unavailable');
+  await expect(page.locator('#health-result')).toHaveAttribute('data-state', 'error');
+  const healthErrorColors = await page.locator('#health-result').evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { foreground: style.color, background: style.backgroundColor };
+  });
+  expect(contrastRatio(healthErrorColors.foreground, healthErrorColors.background))
+    .toBeGreaterThanOrEqual(4.5);
 });

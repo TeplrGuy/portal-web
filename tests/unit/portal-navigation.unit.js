@@ -79,6 +79,8 @@ test('navigation state updates the selected item, visible panel, and page title'
     document,
     FormData: class {},
     fetch: async (url) => ({
+      ok: true,
+      status: 200,
       json: async () => url === '/config' ? config : { status: 'ok' }
     })
   };

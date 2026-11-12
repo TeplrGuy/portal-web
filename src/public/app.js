@@ -1,11 +1,25 @@
 async function getJson(url, options) {
   const response = await fetch(url, options);
-  const payload = await response.json().catch(() => ({}));
+  let payload;
+  try {
+    payload = await response.json();
+  } catch {
+    throw new Error(`The server returned an invalid JSON response (HTTP ${response.status}).`);
+  }
   return { response, payload };
 }
 
 function pretty(value) {
   return JSON.stringify(value, null, 2);
+}
+
+function responseErrorMessage(payload, response) {
+  const message = payload?.message || payload?.error;
+  return typeof message === 'string' ? message : `HTTP ${response.status}`;
+}
+
+function requestErrorMessage(error) {
+  return error instanceof Error ? error.message : 'Unexpected error';
 }
 
 const navigationItems = Array.from(document.querySelectorAll('.nav-link'));
@@ -68,9 +82,22 @@ async function loadConfig() {
 
 async function refreshHealth() {
   const target = document.getElementById('health-result');
+  target.dataset.state = 'loading';
   target.textContent = 'Loading health...';
-  const { payload } = await getJson('/api/health');
-  target.textContent = pretty(payload);
+  try {
+    const { response, payload } = await getJson('/api/health');
+    if (!response.ok) {
+      target.dataset.state = 'error';
+      target.textContent = `Health check failed: ${responseErrorMessage(payload, response)}`;
+      return;
+    }
+
+    target.dataset.state = 'success';
+    target.textContent = pretty(payload);
+  } catch (error) {
+    target.dataset.state = 'error';
+    target.textContent = `Health check failed: ${requestErrorMessage(error)}`;
+  }
 }
 
 navigationItems.forEach((item) => {
@@ -84,6 +111,10 @@ document.getElementById('quick-create-order').addEventListener('click', () => {
 
 document.getElementById('create-order-form').addEventListener('submit', async (event) => {
   event.preventDefault();
+  const status = document.getElementById('create-status');
+  status.dataset.state = 'loading';
+  status.textContent = 'Creating order...';
+
   const form = new FormData(event.currentTarget);
   const body = {
     orderId: form.get('orderId'),
@@ -92,26 +123,62 @@ document.getElementById('create-order-form').addEventListener('submit', async (e
     quantity: Number(form.get('quantity'))
   };
 
-  const { response, payload } = await getJson('/api/orders', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
+  try {
+    const { response, payload } = await getJson('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
 
-  document.getElementById('create-correlation').textContent =
-    response.headers.get('x-correlation-id') || payload.correlationId || 'Unavailable';
-  document.getElementById('create-result').textContent = pretty(payload);
+    document.getElementById('create-correlation').textContent =
+      response.headers.get('x-correlation-id') || payload?.correlationId || 'Unavailable';
+    document.getElementById('create-result').textContent = pretty(payload);
+    if (!response.ok) {
+      status.dataset.state = 'error';
+      status.textContent = `Order creation failed: ${responseErrorMessage(payload, response)}`;
+      return;
+    }
+
+    status.dataset.state = 'success';
+    status.textContent = 'Order created successfully.';
+  } catch (error) {
+    document.getElementById('create-correlation').textContent = 'Unavailable';
+    document.getElementById('create-result').textContent =
+      'No order was created. Check your connection and try again.';
+    status.dataset.state = 'error';
+    status.textContent = `Order creation failed: ${requestErrorMessage(error)}`;
+  }
 });
 
 document.getElementById('track-order-form').addEventListener('submit', async (event) => {
   event.preventDefault();
+  const status = document.getElementById('track-status');
+  status.dataset.state = 'loading';
+  status.textContent = 'Looking up order...';
+
   const form = new FormData(event.currentTarget);
   const orderId = form.get('orderId');
-  const { response, payload } = await getJson(`/api/orders/${encodeURIComponent(orderId)}`);
+  try {
+    const { response, payload } = await getJson(`/api/orders/${encodeURIComponent(orderId)}`);
 
-  document.getElementById('track-correlation').textContent =
-    response.headers.get('x-correlation-id') || payload.correlationId || 'Unavailable';
-  document.getElementById('track-result').textContent = pretty(payload);
+    document.getElementById('track-correlation').textContent =
+      response.headers.get('x-correlation-id') || payload?.correlationId || 'Unavailable';
+    document.getElementById('track-result').textContent = pretty(payload);
+    if (!response.ok) {
+      status.dataset.state = 'error';
+      status.textContent = `Order lookup failed: ${responseErrorMessage(payload, response)}`;
+      return;
+    }
+
+    status.dataset.state = 'success';
+    status.textContent = 'Order details loaded successfully.';
+  } catch (error) {
+    document.getElementById('track-correlation').textContent = 'Unavailable';
+    document.getElementById('track-result').textContent =
+      'Order details could not be loaded. Check your connection and try again.';
+    status.dataset.state = 'error';
+    status.textContent = `Order lookup failed: ${requestErrorMessage(error)}`;
+  }
 });
 
 document.getElementById('refresh-health').addEventListener('click', refreshHealth);

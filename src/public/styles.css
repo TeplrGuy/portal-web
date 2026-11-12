@@ -7,6 +7,9 @@
   --border: #e5e7eb;
   --text: #111827;
   --muted: #6b7280;
+  --success: #166534;
+  --danger: #991b1b;
+  --danger-bg: #fff5f5;
   --accent: #e35d19;
   --accent-soft: #fff1e9;
   --focus: #2563eb;
@@ -305,6 +308,29 @@ input {
   display: grid;
   gap: 0.35rem;
   margin: 1rem 0;
+}
+
+.request-status {
+  min-height: 1.25rem;
+  margin: 0.75rem 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.request-status[data-state="success"] {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.request-status[data-state="error"],
+pre[data-state="error"] {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+pre[data-state="error"] {
+  border-color: var(--danger);
+  background: var(--danger-bg);
 }
 
 pre,
