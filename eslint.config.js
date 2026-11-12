@@ -1,5 +1,5 @@
 module.exports = [{
-  files: ['src/**/*.js', 'tests/integration/**/*.js'],
+  files: ['src/**/*.js', 'tests/integration/**/*.js', 'scripts/**/*.cjs', 'tests/delivery/**/*.cjs'],
   languageOptions: {
     ecmaVersion: 2022,
     sourceType: 'commonjs',
@@ -8,7 +8,8 @@ module.exports = [{
       console: 'readonly',
       fetch: 'readonly',
       process: 'readonly',
-      setTimeout: 'readonly'
+      setTimeout: 'readonly',
+      structuredClone: 'readonly'
     }
   },
   rules: {

@@ -7,7 +7,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "lint": "eslint src tests/integration",
+    "lint": "eslint src tests/integration scripts tests/delivery",
     "test:syntax": "node --check src/server.js && node --check src/public/app.js",
     "test:unit": "npm run test:syntax",
     "test:integration": "node --test \"tests/integration/*.test.js\"",

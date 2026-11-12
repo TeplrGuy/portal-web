@@ -19,7 +19,7 @@ These rules apply when changing the portal UI, browser behavior, or the Express 
 - Preserve form labels and straightforward task language for non-technical demo audiences.
 
 ## CSS rules
-- Keep the visual style consistent with the current dark dashboard aesthetic.
+- Keep the existing visual style unless the task has an approved design reference. For sidebar issue #3, issue #8's white-sidebar reference is authoritative and supersedes older dark-sidebar wording.
 - Prefer extending existing variables and card/layout patterns before introducing new design systems.
 - Avoid fragile layout hacks that make screenshots inconsistent across screen sizes.
 
