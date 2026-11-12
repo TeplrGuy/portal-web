@@ -28,10 +28,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Verify compiled workflows are current
         run: |
-          git diff --exit-code -- .github/workflows/
-          if [ -n "$(git ls-files --others --exclude-standard -- .github/workflows/)" ]; then
-            echo "Compilation produced untracked workflow files."
-            git status --short -- .github/workflows/
+          git diff --exit-code -- .github/workflows/*.lock.yml
+          if [ -n "$(git ls-files --others --exclude-standard -- .github/workflows/*.lock.yml)" ]; then
+            echo "Compilation produced untracked workflow lock files."
+            git status --short -- .github/workflows/*.lock.yml
             exit 1
           fi
 
