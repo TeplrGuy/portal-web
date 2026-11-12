@@ -11,6 +11,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  gh-aw-compile:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up gh-aw CLI
+        uses: github/gh-aw-actions/setup-cli@5c2fe865bb4dc46e1450f6ee0d0541d759aea73a # v0.79.6
+        with:
+          version: v1.2.2
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Compile GH-AW source workflows
+        run: gh aw compile
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify compiled workflows are current
+        run: |
+          git diff --exit-code -- .github/workflows/
+          if [ -n "$(git ls-files --others --exclude-standard -- .github/workflows/)" ]; then
+            echo "Compilation produced untracked workflow files."
+            git status --short -- .github/workflows/
+            exit 1
+          fi
+
   build:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -37,3 +61,7 @@ jobs:
         run: npx playwright install --with-deps chromium
       - if: steps.changes.outputs.e2e == 'true'
         run: npm run test:e2e
+      - name: Explain private full-stack test boundary
+        if: steps.changes.outputs.e2e == 'true'
+        run: |
+          echo "The private full-stack journey is intentionally skipped in public CI. Run it only against an isolated private environment with FULL_STACK_E2E=1 and PORTAL_BASE_URL, INVENTORY_BASE_URL, and NOTIFICATIONS_BASE_URL configured." >> "$GITHUB_STEP_SUMMARY"

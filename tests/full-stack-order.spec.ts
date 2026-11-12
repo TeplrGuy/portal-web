@@ -1,7 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 test('creates and tracks an order through all services', async ({ page, request }) => {
-  test.skip(process.env.FULL_STACK_E2E !== '1', 'Run with the full-stack rehearsal');
+  test.skip(
+    process.env.FULL_STACK_E2E !== '1',
+    'Requires an isolated private stack; run as protected post-deployment verification'
+  );
   const inventoryUrl = process.env.INVENTORY_BASE_URL;
   const notificationsUrl = process.env.NOTIFICATIONS_BASE_URL;
   if (!inventoryUrl || !notificationsUrl) throw new Error('Full-stack service URLs are required');

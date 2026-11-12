@@ -28,3 +28,5 @@ if (process.env.APPLICATIONINSIGHTS_CONNECTION_STRING || process.env.OTEL_EXPORT
   });
   registerInstrumentations({ instrumentations: [new UndiciInstrumentation({ requestHook: scrubRequest })] });
 }
+
+module.exports = { scrubRequest };
