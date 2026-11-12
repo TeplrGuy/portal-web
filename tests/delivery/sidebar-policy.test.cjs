@@ -118,6 +118,8 @@ test('permits sidebar assets and focused tests, including deletion of in-scope f
 test('blocks policy tampering, traversal and out-of-scope rename sources', () => {
   for (const file of [
     { filename: '.github/workflows/ci.yml' },
+    { filename: '.github/workflows/sidebar-policy.yml' },
+    { filename: '.github/workflows/trusted-sidebar-scope.yml' },
     { filename: 'package.json' },
     { filename: 'src/server.js' },
     { filename: 'tests/../package.json' },
@@ -137,6 +139,13 @@ test('malformed policy fails closed', () => {
   ]) {
     assert.throws(() => validatePolicy({ ...source, ...change }));
   }
+});
+
+test('requires the distinct base-controlled scope check', () => {
+  const policy = structuredClone(source);
+  policy.requiredCandidateChecks = policy.requiredCandidateChecks.filter(name => name !== 'trusted-sidebar-scope');
+  policy.requiredCandidateChecks.push('sidebar-scope');
+  assert.throws(() => validatePolicy(policy), /trusted candidate gates/);
 });
 
 function dispatchFixture() {

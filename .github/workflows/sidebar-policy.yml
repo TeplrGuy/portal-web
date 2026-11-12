@@ -23,26 +23,3 @@ jobs:
         with:
           node-version: '24'
       - run: node --test tests/delivery/*.test.cjs
-
-  sidebar-scope:
-    if: github.event.pull_request.user.login == 'copilot-swe-agent[bot]'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.base.sha }}
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - name: Enforce trusted sidebar policy, including rename sources
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
-        run: |
-          test "$BASE_BRANCH" = main
-          changed_files=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq .changed_files)
-          gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files?per_page=100" --jq '.[] | @json' > "$RUNNER_TEMP/sidebar-files.jsonl"
-          node -e "const fs=require('node:fs');const lines=fs.readFileSync(process.argv[1],'utf8').trim();const files=lines?lines.split('\n').map(line=>JSON.parse(line)):[];if(files.length!==Number(process.argv[2]))throw new Error('Incomplete PR file listing');require('./scripts/sidebar-policy.cjs').validateFiles(require('./.github/delivery/sidebar.json'),files);" "$RUNNER_TEMP/sidebar-files.jsonl" "$changed_files"

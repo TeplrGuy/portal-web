@@ -8,7 +8,7 @@
   "dispatchEnvironment": "sidebar-agent-dispatch",
   "designIssue": 8,
   "requiredChecks": ["build", "npm-audit", "validate-skill-runtime", "standards"],
-  "requiredCandidateChecks": ["build", "dependency-review", "npm-audit", "validate-skill-runtime", "standards", "policy-tests", "sidebar-scope"],
+  "requiredCandidateChecks": ["build", "dependency-review", "npm-audit", "validate-skill-runtime", "standards", "policy-tests", "trusted-sidebar-scope"],
   "reviewWorkflow": "ghaw-pr-review.lock.yml",
   "allowedFiles": [
     "src/public/index.html",

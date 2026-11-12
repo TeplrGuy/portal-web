@@ -15,8 +15,9 @@ function validatePolicy(policy) {
     policy.requiredChecks.every(name => typeof name === 'string' && name.length > 0) &&
     new Set(policy.requiredChecks).size === policy.requiredChecks.length, 'Required checks must be explicit and unique');
   assert(Array.isArray(policy.requiredCandidateChecks) &&
-    [...policy.requiredChecks, 'dependency-review', 'policy-tests', 'sidebar-scope']
-      .every(name => policy.requiredCandidateChecks.includes(name)), 'Missing required candidate gates');
+    [...policy.requiredChecks, 'dependency-review', 'policy-tests', 'trusted-sidebar-scope']
+      .every(name => policy.requiredCandidateChecks.includes(name)) &&
+    !policy.requiredCandidateChecks.includes('sidebar-scope'), 'Missing required trusted candidate gates');
   assert(policy.reviewWorkflow === 'ghaw-pr-review.lock.yml', 'Unexpected review workflow');
   assert(Array.isArray(policy.allowedFiles) && policy.allowedFiles.length === 3 &&
     ['src/public/index.html', 'src/public/styles.css', 'src/public/app.js']

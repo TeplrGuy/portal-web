@@ -59,11 +59,15 @@ inspect the issue, native task list and run before retrying; do not remove an
 assignee merely to force redispatch. Labels do not trigger this workflow.
 
 `node --test tests/delivery/*.test.cjs` exercises the admission and scope policy.
-The **Sidebar policy** workflow checks native cloud-agent PRs against the policy
-from their base commit, not a policy modified by the candidate. This pilot is
-limited to #3: other native cloud-agent tasks require their own approved policy
-before dispatch. Include the stable scope check in the reviewed required checks
-before the pilot starts.
+The **Trusted sidebar scope** workflow is defined on the base branch and uses
+`pull_request_target` with read-only permissions. It checks out only the base
+SHA, reads the policy from that trusted revision, and inspects candidate file
+names through the GitHub API; it never executes candidate code. Require the
+distinct `trusted-sidebar-scope` check, not a same-named check from a
+PR-controlled workflow. The separate **Sidebar policy** workflow runs policy
+tests only. This pilot is limited to #3: other native cloud-agent tasks require
+their own approved policy before dispatch. Do not dispatch until the trusted
+workflow is merged into `main` and its check is enforced by branch protection.
 
 Reviewer feedback is tied to a head SHA. Fixes must remain on the existing owned
 PR and receive fresh checks/review; automatic repair is not yet enabled. Retain
