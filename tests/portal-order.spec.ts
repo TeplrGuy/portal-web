@@ -126,6 +126,17 @@ test('navigates the app shell and keeps navigation compact on mobile', async ({ 
       .toBeGreaterThanOrEqual(4.5);
   }
 
+  const formInputs = page.locator('#create-order-form input, #track-order-form input');
+  for (const input of await formInputs.all()) {
+    const name = await input.getAttribute('name');
+    const colors = await input.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return { boundary: style.borderTopColor, surface: style.backgroundColor };
+    });
+    expect(contrastRatio(colors.boundary, colors.surface), `${name} control boundary contrast`)
+      .toBeGreaterThanOrEqual(3);
+  }
+
   await expect(page.getByRole('heading', { name: 'Orders', exact: true })).toBeVisible();
   await expect(page.getByRole('region', { name: 'User profile' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Main navigation' })
