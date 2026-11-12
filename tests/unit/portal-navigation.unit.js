@@ -46,16 +46,12 @@ function createElement(dataset = {}) {
 }
 
 test('navigation state updates the selected item, visible panel, and page title', async () => {
-  const navigationItems = [
-    createElement({ view: 'dashboard', title: 'Dashboard' }),
-    createElement({ view: 'orders', title: 'Orders' }),
-    createElement({ view: 'admin', title: 'Admin' })
-  ];
-  const viewPanels = [
-    createElement({ viewPanel: 'dashboard' }),
-    createElement({ viewPanel: 'orders' }),
-    createElement({ viewPanel: 'admin' })
-  ];
+  const views = ['dashboard', 'orders', 'listing', 'admin', 'settings', 'community', 'tutorial'];
+  const navigationItems = views.map((view) => createElement({
+    view,
+    title: view === 'orders' ? 'Order' : `${view[0].toUpperCase()}${view.slice(1)}`
+  }));
+  const viewPanels = views.map((viewPanel) => createElement({ viewPanel }));
   const elements = new Map();
   const document = {
     title: '',
@@ -89,16 +85,22 @@ test('navigation state updates the selected item, visible panel, and page title'
   const source = fs.readFileSync(path.join(__dirname, '../../src/public/app.js'), 'utf8');
 
   vm.runInNewContext(source, context);
-  navigationItems[0].listeners.get('click')();
   await new Promise((resolve) => setImmediate(resolve));
 
-  assert.equal(navigationItems[0].attributes.get('aria-current'), 'page');
-  assert.equal(navigationItems[0].classList.contains('is-active'), true);
-  assert.equal(navigationItems[1].attributes.has('aria-current'), false);
-  assert.deepEqual(viewPanels.map((panel) => panel.hidden), [false, true, true]);
-  assert.equal(elements.get('page-title').textContent, 'Dashboard');
-  assert.equal(document.title, 'Portal Web | Dashboard');
+  for (const [index, item] of navigationItems.entries()) {
+    item.listeners.get('click')();
+
+    assert.equal(item.attributes.get('aria-current'), 'page');
+    assert.equal(item.classList.contains('is-active'), true);
+    assert.equal(navigationItems.filter((candidate) =>
+      candidate.attributes.get('aria-current') === 'page').length, 1);
+    assert.equal(navigationItems.filter((candidate) =>
+      candidate.classList.contains('is-active')).length, 1);
+    assert.deepEqual(viewPanels.map((panel) => panel.hidden), views.map((_, panelIndex) => panelIndex !== index));
+    assert.equal(elements.get('page-title').textContent, item.dataset.title);
+    assert.equal(document.title, `Portal Web | ${item.dataset.title}`);
+  }
 
   assert.equal(context.setActiveView('unknown'), false);
-  assert.equal(document.title, 'Portal Web | Dashboard');
+  assert.equal(document.title, 'Portal Web | Tutorial');
 });

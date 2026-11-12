@@ -77,7 +77,7 @@ test('creates and tracks an order through the portal', async ({ page }) => {
   });
 
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Orders', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Order', exact: true })).toBeVisible();
 
   await page.getByLabel('Order ID').first().fill(orderId);
   await page.getByLabel('Customer ID').fill('CUST-E2E-1');
@@ -100,6 +100,25 @@ test('creates and tracks an order through the portal', async ({ page }) => {
 });
 
 test('navigates the app shell and keeps navigation compact on mobile', async ({ page }) => {
+  await page.route('**/config', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      environmentName: 'local visual test',
+      buildSha: 'screenshot-only',
+      apiGatewayUrl: 'Not connected',
+      repoLinks: {
+        portal: '#',
+        gateway: '#',
+        orders: '#',
+        contracts: '#',
+        scenarioFeature: '#',
+        scenarioIncident: '#',
+        scenarioRollback: '#'
+      }
+    })
+  }));
+
   await page.route('**/api/health', route => route.fulfill({
     status: 200,
     contentType: 'application/json',
@@ -137,28 +156,69 @@ test('navigates the app shell and keeps navigation compact on mobile', async ({ 
       .toBeGreaterThanOrEqual(3);
   }
 
-  await expect(page.getByRole('heading', { name: 'Orders', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Order', exact: true })).toBeVisible();
   await expect(page.getByRole('region', { name: 'User profile' })).toBeVisible();
-  await expect(page.getByRole('navigation', { name: 'Main navigation' })
-    .getByRole('button', { name: 'Orders' })).toHaveAttribute('aria-current', 'page');
+  const navigation = page.getByRole('navigation', { name: 'Main navigation' });
+  const sections = [
+    { label: 'Dashboard', panel: 'dashboard-view', copy: 'Dashboard metrics will appear here in a future update.' },
+    { label: 'Order', panel: 'orders-view', copy: 'Create order' },
+    { label: 'Listing', panel: 'listing-view', copy: 'Listing tools will appear here in a future update.' },
+    { label: 'Admin', panel: 'admin-view', copy: 'Portal administration tools will appear here in a future update.' },
+    { label: 'Settings', panel: 'settings-view', copy: 'Portal settings will appear here in a future update.' },
+    { label: 'Community', panel: 'community-view', copy: 'Community resources will appear here in a future update.' },
+    { label: 'Tutorial', panel: 'tutorial-view', copy: 'Tutorial guides will appear here in a future update.' }
+  ];
 
-  await page.getByRole('button', { name: 'Dashboard' }).click();
-  await expect(page.getByRole('heading', { name: 'Dashboard', exact: true })).toBeVisible();
-  await expect(page.getByText('Dashboard metrics will appear here in a future update.')).toBeVisible();
+  const dashboardLink = navigation.getByRole('button', { name: 'Dashboard' });
+  const orderLink = navigation.getByRole('button', { name: 'Order', exact: true });
+  await dashboardLink.focus();
+  for (const [index, section] of sections.entries()) {
+    const navLink = navigation.getByRole('button', { name: section.label, exact: true });
+    await expect(navLink).toBeFocused();
+    if (index < sections.length - 1) await page.keyboard.press('Tab');
+  }
 
-  await page.getByRole('button', { name: 'Admin' }).click();
-  await expect(page.getByRole('heading', { name: 'Admin', exact: true })).toBeVisible();
-  await expect(page.getByText('Portal administration tools will appear here in a future update.')).toBeVisible();
-
-  await page.locator('#quick-create-order').click();
-  await expect(page.getByRole('heading', { name: 'Orders', exact: true })).toBeVisible();
+  await dashboardLink.focus();
+  await page.keyboard.press('Tab');
+  await expect(orderLink).toBeFocused();
+  await page.keyboard.press('Enter');
   await expect(page.locator('#orders-view')).toBeVisible();
-  await page.screenshot({ path: 'test-results/issue-3-sidebar-shell.png', fullPage: true });
+
+  for (const section of sections) {
+    const navLink = navigation.getByRole('button', { name: section.label, exact: true });
+    await navLink.click();
+    await expect(navLink).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('.nav-link[aria-current="page"]')).toHaveCount(1);
+    await expect(page.locator('#page-title')).toHaveText(section.label);
+    await expect(page.locator(`#${section.panel}`)).toBeVisible();
+    await expect(page.locator(`#${section.panel}`)).toContainText(section.copy);
+    await page.screenshot({
+      path: `test-results/sidebar-${section.label.toLowerCase()}.png`
+    });
+  }
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.getByRole('button', { name: 'Dashboard' })).toBeVisible();
   await expect(page.locator('.sidebar')).toHaveCSS('flex-basis', '72px');
   await expect(page.getByRole('region', { name: 'User profile' })).toBeVisible();
+  await navigation.getByRole('button', { name: 'Order', exact: true }).click();
+  await expect(page.locator('#orders-view')).toBeVisible();
+  const mobileSidebarBox = await page.locator('.sidebar').boundingBox();
+  const mobileProfileBox = await page.locator('.profile').boundingBox();
+  if (!mobileSidebarBox || !mobileProfileBox) throw new Error('Mobile sidebar or profile is not rendered');
+  expect(mobileSidebarBox.y).toBeCloseTo(0, 0);
+  expect(mobileProfileBox.y).toBeGreaterThanOrEqual(0);
+  expect(mobileProfileBox.y + mobileProfileBox.height).toBeGreaterThanOrEqual(780);
+  expect(mobileProfileBox.y + mobileProfileBox.height).toBeLessThanOrEqual(844);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+    .toBe(true);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(page.locator('#page-title')).toBeInViewport();
+  await page.screenshot({ path: 'test-results/sidebar-mobile-order.png' });
+
+  await page.locator('#quick-create-order').click();
+  await expect(page.getByRole('heading', { name: 'Order', exact: true })).toBeVisible();
+  await expect(page.locator('#create-order-form')).toBeInViewport();
 
   await page.locator('#orders-view').evaluate((panel) => {
     const spacer = document.createElement('div');

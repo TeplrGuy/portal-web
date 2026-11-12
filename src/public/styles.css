@@ -1,6 +1,6 @@
 :root {
   color-scheme: light;
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI Variable", "Segoe UI", Tahoma, sans-serif;
   --page-bg: #f6f7f9;
   --sidebar-bg: #fff;
   --panel-bg: #fff;
@@ -76,6 +76,12 @@ button {
 .primary-nav {
   display: grid;
   gap: 0.35rem;
+}
+
+.nav-group-label {
+  padding: 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.75rem;
 }
 
 .nav-link {
@@ -393,6 +399,10 @@ code {
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
+  }
+
+  .nav-group-label {
+    display: none;
   }
 
   .profile {
