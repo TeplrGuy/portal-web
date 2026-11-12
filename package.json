@@ -9,7 +9,7 @@
     "start": "node src/server.js",
     "lint": "eslint src tests/integration",
     "test:syntax": "node --check src/server.js && node --check src/public/app.js",
-    "test:unit": "npm run test:syntax",
+    "test:unit": "npm run test:syntax && node --test tests/unit/*.unit.js",
     "test:integration": "node --test \"tests/integration/*.test.js\"",
     "test:e2e": "playwright test"
   },
