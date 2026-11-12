@@ -2,7 +2,8 @@
 description: Triage incoming issues — classify, label, assess scope, recommend owner model
 on:
   issues:
-    types: [opened, edited, reopened]
+    types: [opened, reopened]
+  skip-if-match: 'label:triage-generated OR label:agentic-workflows'
   roles: [admin, maintainer, write]
 permissions:
   copilot-requests: write
@@ -10,7 +11,8 @@ permissions:
   issues: read
   pull-requests: read
 tracker-id: portal-issue-triage
-max-ai-credits: 3
+max-ai-credits: 250
+max-turns: 20
 safe-outputs:
   add-comment:
     max: 1
