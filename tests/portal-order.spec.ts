@@ -54,13 +54,13 @@ test('creates and tracks an order through the portal', async ({ page }) => {
   });
 
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Portal Web' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Orders', exact: true })).toBeVisible();
 
   await page.getByLabel('Order ID').first().fill(orderId);
   await page.getByLabel('Customer ID').fill('CUST-E2E-1');
   await page.getByLabel('SKU').fill('SKU-100');
   await page.getByLabel('Quantity').fill('1');
-  await page.getByRole('button', { name: 'Create order' }).click();
+  await page.locator('#create-order-form').getByRole('button', { name: 'Create order' }).click();
 
   await expect(page.locator('#create-result')).toContainText(orderId, { timeout: 30_000 });
   await expect(page.locator('#create-result')).toContainText('"status": "created"', { timeout: 30_000 });
@@ -74,4 +74,36 @@ test('creates and tracks an order through the portal', async ({ page }) => {
   await expect(page.locator('#track-result')).toContainText('"status": "created"', { timeout: 30_000 });
   await expect(page.locator('#track-result')).toContainText('"inventory_reserved"', { timeout: 30_000 });
   await expect(page.locator('#track-correlation')).not.toHaveText('Not generated yet');
+});
+
+test('navigates the app shell and keeps navigation compact on mobile', async ({ page }) => {
+  await page.route('**/api/health', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({ service: 'api-gateway', status: 'ok' })
+  }));
+
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Orders', exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'User profile' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Main navigation' })
+    .getByRole('button', { name: 'Orders' })).toHaveAttribute('aria-current', 'page');
+
+  await page.getByRole('button', { name: 'Dashboard' }).click();
+  await expect(page.getByRole('heading', { name: 'Dashboard', exact: true })).toBeVisible();
+  await expect(page.getByText('Dashboard metrics will appear here in a future update.')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Admin' }).click();
+  await expect(page.getByRole('heading', { name: 'Admin', exact: true })).toBeVisible();
+  await expect(page.getByText('Portal administration tools will appear here in a future update.')).toBeVisible();
+
+  await page.locator('#quick-create-order').click();
+  await expect(page.getByRole('heading', { name: 'Orders', exact: true })).toBeVisible();
+  await expect(page.locator('#orders-view')).toBeVisible();
+  await page.screenshot({ path: 'test-results/issue-3-sidebar-shell.png', fullPage: true });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole('button', { name: 'Dashboard' })).toBeVisible();
+  await expect(page.locator('.sidebar')).toHaveCSS('flex-basis', '72px');
+  await expect(page.getByRole('region', { name: 'User profile' })).toBeVisible();
 });

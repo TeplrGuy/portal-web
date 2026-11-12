@@ -8,6 +8,32 @@ function pretty(value) {
   return JSON.stringify(value, null, 2);
 }
 
+const navigationItems = Array.from(document.querySelectorAll('.nav-link'));
+const viewPanels = Array.from(document.querySelectorAll('[data-view-panel]'));
+
+function setActiveView(viewName) {
+  const selectedItem = navigationItems.find((item) => item.dataset.view === viewName);
+  if (!selectedItem) return false;
+
+  navigationItems.forEach((item) => {
+    const isActive = item === selectedItem;
+    item.classList.toggle('is-active', isActive);
+    if (isActive) {
+      item.setAttribute('aria-current', 'page');
+    } else {
+      item.removeAttribute('aria-current');
+    }
+  });
+
+  viewPanels.forEach((panel) => {
+    panel.hidden = panel.dataset.viewPanel !== viewName;
+  });
+
+  document.getElementById('page-title').textContent = selectedItem.dataset.title;
+  document.title = `Portal Web | ${selectedItem.dataset.title}`;
+  return true;
+}
+
 function renderLinks(links) {
   const grid = document.getElementById('link-grid');
   grid.innerHTML = '';
@@ -46,6 +72,15 @@ async function refreshHealth() {
   const { payload } = await getJson('/api/health');
   target.textContent = pretty(payload);
 }
+
+navigationItems.forEach((item) => {
+  item.addEventListener('click', () => setActiveView(item.dataset.view));
+});
+
+document.getElementById('quick-create-order').addEventListener('click', () => {
+  setActiveView('orders');
+  document.getElementById('create-order-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 
 document.getElementById('create-order-form').addEventListener('submit', async (event) => {
   event.preventDefault();

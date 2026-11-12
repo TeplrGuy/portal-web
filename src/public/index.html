@@ -3,65 +3,116 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Portal Web</title>
+    <title>Portal Web | Orders</title>
     <link rel="stylesheet" href="/styles.css">
   </head>
   <body>
-    <header class="hero">
-      <div>
-        <p class="eyebrow">Agentic SDLC Demo</p>
-        <h1>Portal Web</h1>
-        <p class="subtitle">Visible business flow, engineering evidence, and deployment traceability in one place.</p>
-      </div>
-      <div class="meta-card">
-        <div><span>Environment</span><strong id="environment-name">Loading...</strong></div>
-        <div><span>Build</span><strong id="build-sha">Loading...</strong></div>
-        <div><span>Gateway</span><strong id="gateway-url">Loading...</strong></div>
-      </div>
-    </header>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Portal sidebar">
+        <a class="brand" href="/" aria-label="Portal Web home">
+          <span class="brand-mark" aria-hidden="true">P</span>
+          <span class="brand-name">Portal Web</span>
+        </a>
 
-    <main class="layout">
-      <section class="card">
-        <h2>Create order</h2>
-        <form id="create-order-form">
-          <label>Order ID<input name="orderId" value="ORD-PORTAL-001" required></label>
-          <label>Customer ID<input name="customerId" value="CUST-PORTAL-1" required></label>
-          <label>SKU<input name="sku" value="SKU-100" required></label>
-          <label>Quantity<input name="quantity" type="number" value="1" min="1" required></label>
-          <button type="submit">Create order</button>
-        </form>
-        <div class="inline-meta">
-          <span>Correlation ID</span>
-          <code id="create-correlation">Not generated yet</code>
-        </div>
-        <pre id="create-result">No order created yet.</pre>
-      </section>
+        <nav class="primary-nav" aria-label="Main navigation">
+          <button class="nav-link" type="button" data-view="dashboard" data-title="Dashboard" aria-controls="dashboard-view">
+            <span class="nav-icon" aria-hidden="true">⌂</span>
+            <span class="nav-label">Dashboard</span>
+          </button>
+          <button class="nav-link is-active" type="button" data-view="orders" data-title="Orders" aria-controls="orders-view" aria-current="page">
+            <span class="nav-icon" aria-hidden="true">▤</span>
+            <span class="nav-label">Orders</span>
+          </button>
+          <button class="nav-link" type="button" data-view="admin" data-title="Admin" aria-controls="admin-view">
+            <span class="nav-icon" aria-hidden="true">⚙</span>
+            <span class="nav-label">Admin</span>
+          </button>
+        </nav>
 
-      <section class="card">
-        <h2>Track order</h2>
-        <form id="track-order-form">
-          <label>Order ID<input name="orderId" value="ORD-PORTAL-001" required></label>
-          <button type="submit">Track order</button>
-        </form>
-        <div class="inline-meta">
-          <span>Correlation ID</span>
-          <code id="track-correlation">Not generated yet</code>
-        </div>
-        <pre id="track-result">No order tracked yet.</pre>
-      </section>
+        <section class="profile" aria-label="User profile">
+          <span class="profile-avatar" aria-hidden="true">ES</span>
+          <span class="profile-details">
+            <strong>Demo User</strong>
+            <span>demo@example.com</span>
+          </span>
+        </section>
+      </aside>
 
-      <section class="card">
-        <h2>System status</h2>
-        <button id="refresh-health" type="button">Refresh health</button>
-        <pre id="health-result">Waiting for health check.</pre>
-      </section>
+      <main class="main-content">
+        <header class="page-header">
+          <div>
+            <p class="eyebrow">Agentic SDLC Demo</p>
+            <h1 id="page-title">Orders</h1>
+            <p class="subtitle">Visible business flow, engineering evidence, and deployment traceability in one place.</p>
+          </div>
+          <button id="quick-create-order" class="primary-action" type="button">
+            <span aria-hidden="true">+</span>
+            Create order
+          </button>
+        </header>
 
-      <section class="card wide">
-        <h2>Demo evidence links</h2>
-        <div class="link-grid" id="link-grid"></div>
-      </section>
-    </main>
+        <section class="meta-strip" aria-label="Portal environment">
+          <div><span>Environment</span><strong id="environment-name">Loading...</strong></div>
+          <div><span>Build</span><strong id="build-sha">Loading...</strong></div>
+          <div><span>Gateway</span><strong id="gateway-url">Loading...</strong></div>
+        </section>
+
+        <section id="orders-view" class="view-panel" data-view-panel="orders" aria-labelledby="page-title">
+          <div class="layout">
+            <section class="card">
+              <h2>Create order</h2>
+              <form id="create-order-form">
+                <label>Order ID<input name="orderId" value="ORD-PORTAL-001" required></label>
+                <label>Customer ID<input name="customerId" value="CUST-PORTAL-1" required></label>
+                <label>SKU<input name="sku" value="SKU-100" required></label>
+                <label>Quantity<input name="quantity" type="number" value="1" min="1" required></label>
+                <button type="submit">Create order</button>
+              </form>
+              <div class="inline-meta">
+                <span>Correlation ID</span>
+                <code id="create-correlation">Not generated yet</code>
+              </div>
+              <pre id="create-result">No order created yet.</pre>
+            </section>
+
+            <section class="card">
+              <h2>Track order</h2>
+              <form id="track-order-form">
+                <label>Order ID<input name="orderId" value="ORD-PORTAL-001" required></label>
+                <button type="submit">Track order</button>
+              </form>
+              <div class="inline-meta">
+                <span>Correlation ID</span>
+                <code id="track-correlation">Not generated yet</code>
+              </div>
+              <pre id="track-result">No order tracked yet.</pre>
+            </section>
+
+            <section class="card">
+              <h2>System status</h2>
+              <button id="refresh-health" type="button">Refresh health</button>
+              <pre id="health-result">Waiting for health check.</pre>
+            </section>
+
+            <section class="card wide">
+              <h2>Demo evidence links</h2>
+              <div class="link-grid" id="link-grid"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="dashboard-view" class="view-panel placeholder" data-view-panel="dashboard" aria-labelledby="page-title" hidden>
+          <h2>Dashboard overview</h2>
+          <p>Dashboard metrics will appear here in a future update.</p>
+        </section>
+
+        <section id="admin-view" class="view-panel placeholder" data-view-panel="admin" aria-labelledby="page-title" hidden>
+          <h2>Administration</h2>
+          <p>Portal administration tools will appear here in a future update.</p>
+        </section>
+      </main>
+    </div>
 
     <script src="/app.js"></script>
   </body>
-  </html>
+</html>
