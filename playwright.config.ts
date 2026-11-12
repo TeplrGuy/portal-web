@@ -5,10 +5,10 @@ export default defineConfig({
   testMatch: '**/*.spec.ts',
   timeout: 60_000,
   use: {
-    baseURL: 'http://127.0.0.1:3000',
+    baseURL: process.env.PORTAL_BASE_URL || 'http://127.0.0.1:3000',
     trace: 'on-first-retry'
   },
-  webServer: {
+  webServer: process.env.FULL_STACK_E2E === '1' ? undefined : {
     command: 'npm start',
     url: 'http://127.0.0.1:3000/health',
     reuseExistingServer: !process.env.CI,
