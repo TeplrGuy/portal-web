@@ -18,10 +18,6 @@ safe-outputs:
     max: 1
   add-labels:
     max: 5
-  create-issue:
-    title-prefix: "[triage-split] "
-    labels: [automation, triage-generated]
-    max: 2
 ---
 
 # Portal Issue Triage Agent
@@ -98,7 +94,9 @@ When a new issue arrives:
 
 6. **Apply labels** based on classification (bug, enhancement, incident, frontend, cross-service, delegated-candidate as appropriate).
 
-7. **If scope is cross-service**, create up to 2 follow-up task issues for the downstream service slices.
+7. **Reuse existing work.** Link existing tasks and dependencies instead of generating new issues. For #3, use existing #28 then #29 sequentially under one owner. Issue #8 is the approved white-sidebar design authority.
+
+8. **Separate readiness from authority.** A triage comment or label is advisory, never permission to assign an agent, change protections, merge, or deploy. The trusted Sidebar delivery admission workflow owns dispatch after prerequisite checks. Do not dispatch children independently.
 
 ## Constraints
 - Do not propose direct pushes to protected branches

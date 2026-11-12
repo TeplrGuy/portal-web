@@ -1,0 +1,35 @@
+name: Sidebar delivery admission
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_base_sha:
+        description: Reviewed main commit SHA (40 lowercase hex characters)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sidebar-delivery-issue-3
+  cancel-in-progress: false
+
+jobs:
+  admit:
+    if: github.repository == 'TeplrGuy/portal-web' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: sidebar-agent-dispatch
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate policy and assign the existing issue once
+        run: node scripts/dispatch-sidebar.cjs
+        env:
+          EXPECTED_BASE_SHA: ${{ inputs.expected_base_sha }}
+          COPILOT_ASSIGNMENT_TOKEN: ${{ secrets.COPILOT_ASSIGNMENT_TOKEN }}

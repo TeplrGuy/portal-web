@@ -59,12 +59,15 @@ Analyze the pull request and:
    - Is the PR branch clearly owned by a single session?
    - Is the reviewer separate from the implementer?
 
-5. **Post one review comment** in this format:
+5. **Review the exact candidate.** Record the PR head SHA. For sidebar #3, read `.github/delivery/sidebar.json`, check allowed files including rename sources, and map each acceptance criterion to real assertions and evidence. Use #8's white-sidebar reference, not the superseded dark-sidebar wording. Distinguish mocked browser coverage, local real-stack rehearsal, and live dev verification. A success narrative is not test evidence.
+
+6. **Post one review comment** in this format:
 
 ```
 ## PR Review Summary
 
 **Scope:** <UI | Server | Workflow | Test | Config>
+**Head SHA:** <exact reviewed commit>
 **Risk level:** <Low | Medium | High> — <one sentence rationale>
 
 **Route:** `review:<app|platform>`
@@ -80,9 +83,13 @@ Analyze the pull request and:
 **Post-merge follow-up:** <if any>
 
 **Session safety:** Branch ownership clear | Reviewer = implementer detected
+
+**Findings:** <only concrete defects, with file/line, impact, and focused fix; or no actionable findings>
+**Acceptance evidence:** <criterion -> assertion/run/artifact; mark missing evidence explicitly>
+**Authority:** Advisory review only; not human approval or permission to merge/deploy.
 ```
 
-6. **Apply label**: `review:app` for UI/server changes, `review:platform` for workflow changes.
+7. **Apply label**: `review:app` for UI/server changes, `review:platform` for workflow changes. Labels are informational, never authorization.
 
 ## Constraints
 - One comment per PR (update if already commented)

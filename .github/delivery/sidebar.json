@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "enabled": false,
+  "repository": "TeplrGuy/portal-web",
+  "issue": 3,
+  "childIssues": [28, 29],
+  "baseBranch": "main",
+  "dispatchEnvironment": "sidebar-agent-dispatch",
+  "designIssue": 8,
+  "requiredChecks": ["build", "npm-audit", "validate-skill-runtime", "standards"],
+  "requiredCandidateChecks": ["build", "dependency-review", "npm-audit", "validate-skill-runtime", "standards", "policy-tests", "sidebar-scope"],
+  "reviewWorkflow": "ghaw-pr-review.lock.yml",
+  "allowedFiles": [
+    "src/public/index.html",
+    "src/public/styles.css",
+    "src/public/app.js"
+  ],
+  "acceptance": [
+    "Use issue #8 and docs/ui/order-dashboard-reference.png: white sidebar, orange actions and light page shell. Older dark-sidebar wording is superseded.",
+    "Implement existing #28 first, then #29, in one PR for #3. Do not assign children independently or create replacement issues.",
+    "Use a roughly 220px sidebar at desktop sizes and compact, keyboard-accessible navigation below 768px; test 767px and 768px explicitly.",
+    "Include Dashboard, Order, Listing, Admin, Settings, Community and Tutorial navigation, active aria-current state, changing headings, placeholders and a bottom-aligned static demo profile.",
+    "Preserve create/track order forms, stable IDs, correlation IDs, visible loading/errors/results, environment/build/health information and evidence links.",
+    "Add focused behavioral tests and Playwright coverage for navigation, responsive layout and create/track regressions. Do not change package manifests, workflows, server code or backend contracts.",
+    "Attach desktop/mobile screenshots and test evidence to the existing PR/issue. Local API mocks do not prove deployed full-stack behavior.",
+    "Reference #3, #28 and #29 without auto-closing keywords: completion includes verified dev delivery after required human review and merge.",
+    "Stop and report blockers rather than weakening checks, modifying visual baselines or expanding scope. Never merge, approve, deploy or change credentials."
+  ]
+}
